@@ -12,8 +12,11 @@ import se.mete.movieDatabase.MovieRepository; // Abstract layer to interact with
 import java.util.List; // List object defined default in util
 
 
-// baseURL annotation
-@Path("/movies")
+/**
+ * MovieResource class is a RESTful controller between clint and db
+ * It handles HTTP CRUD <Create, Read, Update, Delete> requests
+ */
+@Path("/movies") // baseURL annotation
 // MovieResource is a restfull web service intermediate, controller between client and database
 public class MovieResource {
     // Dependency injection of MovieRepository
@@ -21,43 +24,65 @@ public class MovieResource {
     private MovieRepository movieRepository;
 
 
-    // Read all movies at once from database
+    /**
+     * Retrieves all movies from db
+     *
+     * @return a list of Movies in JSON format
+     */
     @GET// HTTP GET Request for all movies
-    @Produces(MediaType.APPLICATION_JSON) // Output in JSON format
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Movie> getMovies() {
-        return movieRepository.findMovies(); //  movieRepository objects method to get all movies as a list object
+        return movieRepository.findMovies();
     }
 
 
-    // Read a movie from database
+
+    /**
+     * Retrieves only one movie from the db based on matching ID
+     *
+     * @param id the ID of the movie to retrieve
+     * @return a Response contains movies info in JSON format with status 200 if movie find otherwise status 400
+     */
     @GET // HTTP GET request for each individual movie
     @Path("/{id}") // ID part in URL to detect each movie from database
     @Produces(MediaType.APPLICATION_JSON) // Returns movies data in JSON format
-    public Response getMovie(@PathParam("id") Long id) { // ID part from URL extracted and give as an parameter to getMovie method
-        Movie movie = movieRepository.findMovie(id); // Checks movie in db and returns it in movie variable
-        if (movie == null) { // If movie doesnt found, return 404 error
+    public Response getMovie(@PathParam("id") Long id) {
+        Movie movie = movieRepository.findMovie(id);
+        if (movie == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
-        } // Otherwise
-        return Response.ok(movie).build(); // Return movie with 200
+        }
+        return Response.ok(movie).build();
     }
 
 
-    // Creates a new movie in db
+    /**
+     * Add only one movie to the db at a time
+     *
+     * @param movie as JSON format to add into db
+     * @return a Response 201 with "Movie created" message
+     */
     @POST// HTTP POST request for each individual movie
     @Consumes(MediaType.APPLICATION_JSON) // Expects from client to send data in JSON format
     public Response addMovie(Movie movie) {
-        movieRepository.createMovie(movie); // Adds one movie into database
-        return Response.status(Response.Status.CREATED).entity("Movie created").build(); // Returns 201 and message if successful
+        movieRepository.createMovie(movie);
+        return Response.status(Response.Status.CREATED).entity("Movie created").build();
     }
 
 
-    // Updating one existing movie
+
+    /**
+     * Updates an existing movie in the db
+     *
+     * @param id the ID of the old movie
+     * @param updatedMovie the new movie object
+     * @return a Response 404 with message if movie doesn't found, otherwise updates movie and return 200 with message
+     */
     @PUT // HTTP PUT request for each individual movie
     @Path("/{id}") // Updates movie which matches with ID from URL
     @Consumes(MediaType.APPLICATION_JSON) // Data from client expected in JSON format
-    public Response updateMovie(@PathParam("id") Long id, Movie updatedMovie) { // ID from URL extracted and given as paramater into this method
-        Movie existingMovie = movieRepository.findMovie(id); // First checks if any movie existed in db based on given ID
-        if (existingMovie == null) { // If there is no, we can not update not existing movie, returns 404 error and message
+    public Response updateMovie(@PathParam("id") Long id, Movie updatedMovie) {
+        Movie existingMovie = movieRepository.findMovie(id);
+        if (existingMovie == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Movie not found").build();
         }
 
@@ -73,17 +98,21 @@ public class MovieResource {
     }
 
 
-    // Deleting an existing movie
+    /**
+     * Deletes a movie from db based on matching id
+     *
+     * @param id the ID of the movie to be deleted
+     * @return a Response 404 with message if movie doesn't found, otherwise deletes the movie and return 200 with message
+     */
     @DELETE // HTTP DELETE request for each individual movie
     @Path("/{id}") // Deletes movie with matching ID from URL
-    public Response deleteMovie(@PathParam("id") Long id) { // Gives ID from URL as parameter into method
-        Movie existingMovie = movieRepository.findMovie(id); // Checks if there is a ID matching movie in db
-        if (existingMovie == null) { // If there is no, returns message and 404
+    public Response deleteMovie(@PathParam("id") Long id) {
+        Movie existingMovie = movieRepository.findMovie(id);
+        if (existingMovie == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Movie not found").build();
         }
 
-
-        movieRepository.deleteMovie(id); // Deletes movie from mathcing ID
-        return Response.ok("Movie deleted successfully").build(); // Return 200(OK) and deletes movies
+        movieRepository.deleteMovie(id);
+        return Response.ok("Movie deleted successfully").build();
     }
 }

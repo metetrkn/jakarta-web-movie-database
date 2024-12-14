@@ -17,32 +17,66 @@ import java.util.List; // Default list class
 // To ensure data persistence
 @Transactional
 
-// Abstract layer to handle with data until data become persistence in database
+
+
+/**
+ * The MovieRepository class provides an abstract layer to handle data operations.
+ * It is responsible for CRUD operations in the db.
+ * Uses transactions and ensures data persistence.
+ */
 public class MovieRepository {
     // Injects EntityManager object which interact with database
     @PersistenceContext
     private EntityManager entityManager;
 
-    // Returns all movies from database
+
+    /**
+     * Returns all movies from db
+     *
+     * @return a list of Movie entities
+     */
     public List<Movie> findMovies() {
         return entityManager.createQuery("SELECT m FROM Movie m", Movie.class).getResultList();
     }
 
-    // Returns one movie from database
+
+    /**
+     * Returns just one movie from db
+     *
+     * @return only one Movie entity.
+     */
     public Movie findMovie(Long id) {
         return entityManager.find(Movie.class, id);
     }
 
+
+    /**
+     * Creates one movie in table,db
+     *
+     * @param movie to be persisted in the db
+     */
     // Create one movie into database
     public void createMovie(Movie movie) {
         entityManager.persist(movie);
     }
 
+
+    /**
+     * Updates one existing movie in table,db
+     *
+     * @param movie to be updated in the db
+     */
     // Update one movie which is already in database
     public void updateMovie(Movie movie) {
         entityManager.merge(movie);
     }
 
+
+    /**
+     * Deletes one movie in table,db
+     *
+     * @param id the ID of the movie to be deleted
+     */
     // Delete one movie from database
     public void deleteMovie(Long id) {
         Movie movie = findMovie(id);
